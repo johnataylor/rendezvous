@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>f14e3b4b-4c11-40cb-9070-1a7fcbafec8b</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Implementation\**" />
+    <EmbeddedResource Remove="Implementation\**" />
+    <None Remove="Implementation\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="IToolManager.cs" />
+    <Compile Remove="Rendezvous.cs" />
+    <Compile Remove="RendezvousItem.cs" />
+    <Compile Remove="ToolManager.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>
