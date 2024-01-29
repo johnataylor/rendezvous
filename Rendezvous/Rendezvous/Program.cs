@@ -1,5 +1,5 @@
 ﻿
 using Rendezvous;
 
-Tests.Test0().Wait
+Tests.Test0().Wait();
 

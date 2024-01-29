@@ -21,10 +21,8 @@ namespace Rendezvous
 
             var rendezvous = new RendezvousState
             {
-                Items =
-                [
-                    new RendezvousItem { Id = "1" }
-                ]
+                Id = "blah",
+                Items = [ new RendezvousItem { Id = "1" } ]
             };
 
             var blobClient = containerClient.GetBlobClient(GetBlobName(RunId));

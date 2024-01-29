@@ -9,19 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Implementation\**" />
-    <EmbeddedResource Remove="Implementation\**" />
-    <None Remove="Implementation\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="IToolManager.cs" />
-    <Compile Remove="Rendezvous.cs" />
-    <Compile Remove="RendezvousItem.cs" />
-    <Compile Remove="ToolManager.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
   </ItemGroup>
