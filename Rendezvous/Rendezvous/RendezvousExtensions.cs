@@ -8,9 +8,36 @@
         }
         public static bool Apply(this RendezvousUpdate rendezvousUpdate, RendezvousState state)
         {
-            // add items
+            // basically a super simplistic patch implementation that doesn't a
+
+            var newItems = new List<RendezvousItem>();
+            var newItemsLookup = new HashSet<string>();
 
             // remove items
+
+            var removeLookup = new HashSet<string>(rendezvousUpdate.ItemsToRemove);
+
+            foreach (var item in state.Items)
+            {
+                if (!removeLookup.Contains(item.Id))
+                {
+                    newItems.Add(item);
+                    newItemsLookup.Add(item.Id);
+                }
+            }
+
+            // add items
+
+            foreach (var item in state.Items)
+            {
+                if (!newItemsLookup.Contains(item.Id))
+                {
+                    newItems.Add(item);
+                    newItemsLookup.Add(item.Id);
+                }
+            }
+
+            state.Items = newItems.ToArray();
 
             return true;
         }
