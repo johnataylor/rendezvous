@@ -1,39 +1,43 @@
 ﻿using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.Extensions.Configuration;
+using System.Text;
+using System.Text.Json;
 
 namespace Rendezvous
 {
     internal class Storage : IStorage
     {
-        private readonly BlobClient _blobClient;
+        private const string ContainerName = "testing";
+        private readonly BlobContainerClient _containerClient;
 
-        public Storage(BlobClient blobClient)
+        public Storage(IConfiguration config)
         {
-            _blobClient = blobClient;
+            var connectionString = config["BlobConnectionString"];
+            _containerClient = new BlobContainerClient(connectionString, ContainerName);
         }
 
         public async Task<(T state, ETag eTag)> LoadAsync<T>(string blobName)
         {
-            Response<BlobDownloadResult> response = await _blobClient.DownloadContentAsync();
-            BlobDownloadResult downloadResult = response.Value;
-            string blobContents = downloadResult.Content.ToString();
-
-            ETag originalETag = downloadResult.Details.ETag;
-
-            throw new NotImplementedException();
+            var blobClient = _containerClient.GetBlobClient(blobName);
+            var response = await blobClient.DownloadContentAsync();
+            var json = Encoding.UTF8.GetString(response.Value.Content);
+            var state = JsonSerializer.Deserialize<T>(json) ?? throw new Exception($"unable to derserialize content to '{typeof(T).Name}'");
+            var originalETag = response.Value.Details.ETag;
+            return (state, originalETag);
         }
 
-        public Task CreateAsync<T>(string blobName, T state)
+        public async Task CreateAsync<T>(string blobName, T state)
         {
-            throw new NotImplementedException();
+            await _containerClient.UploadBlobAsync(blobName, new BinaryData(state));
         }
 
         public async Task<bool> SaveAsync<T>(string blobName, T state, ETag eTag)
         {
-            var blobContent = "blah blah blah";
+            var blobClient = _containerClient.GetBlobClient(blobName);
 
-            BlobUploadOptions blobUploadOptions = new()
+            var blobUploadOptions = new BlobUploadOptions
             {
                 Conditions = new BlobRequestConditions()
                 {
@@ -41,15 +45,20 @@ namespace Rendezvous
                 }
             };
 
-            // This call should fail with error code 412 (Precondition Failed)
-            BlobContentInfo blobContentInfo =
-                await _blobClient.UploadAsync(BinaryData.FromString(blobContent), blobUploadOptions);
+            try
+            {
+                BlobContentInfo blobContentInfo = await blobClient.UploadAsync(new BinaryData(state), blobUploadOptions);
+                return true;
+            }
+            catch (RequestFailedException ex)
+            {
 
-            throw new NotImplementedException();
+                return false;
+            }
         }
-        public Task DeleteAsync(string blobName)
+        public async Task DeleteAsync(string blobName)
         {
-            throw new NotImplementedException();
+            await _containerClient.DeleteBlobAsync(blobName);
         }
     }
 }

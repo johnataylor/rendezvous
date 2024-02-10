@@ -15,23 +15,24 @@ namespace Rendezvous
                 .AddUserSecrets<Program>()
                 .Build();
 
-            var connectionString = config["BlobConnectionString"];
-            var containerClient = new BlobContainerClient(connectionString, ContainerName);
-
-
             var rendezvous = new RendezvousState
             {
                 Id = "blah",
                 Items = [ new RendezvousItem { Id = "1" } ]
             };
 
-            var blobClient = containerClient.GetBlobClient(GetBlobName(RunId));
-            await blobClient.UploadAsync(new BinaryData(rendezvous), true);
+            var storage = new Storage(config);
 
-
-
+            await storage.CreateAsync(GetBlobName(RunId), rendezvous);
 
             //await BlobStorageHelpers.DownloadAsync<Rendezvous>(_containerClient, GetBlobName(runId));
+
+            var update = new RendezvousUpdate
+            {
+                Id = "blah",
+                ItemsToAdd = [new RendezvousItem { Id = "2" }, new RendezvousItem { Id = "3" }],
+                ItemsToRemove = ["1"]
+            };
 
 
         }
